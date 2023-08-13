@@ -1,0 +1,123 @@
+# different sounds sorted by volume levels
+SOUNDS_OF_2 = ["pling", "PLING", "*PLING*"]
+SOUNDS_OF_3 = ["plang", "PLANG", "*PLANG*"]
+SOUNDS_OF_5 = ["plong", "PLONG", "*PLONG*"]
+SOUNDS_OF_17 = ["tshäng", "TSHÄNG", "*TSHÄNG*"]
+SOUNDS_OF_ALL = [SOUNDS_OF_2, SOUNDS_OF_3, SOUNDS_OF_5, SOUNDS_OF_17]
+
+# volume levels
+MAX = 2
+MID = 1
+MIN = 0
+
+# any number > 0 is possible
+NUMBER_OF_RAINDROPS = 24
+
+
+# prime number decomposition of one raindrop. Return: prime factors of one raindrop in an array
+def prime_number_decomposition(raindrop)
+    given_prime_numbers = [2, 3, 5, 17]
+    prime_factors = []
+    given_prime_numbers.each do |prime|
+        while raindrop % prime == 0
+            prime_factors.push(prime)
+            raindrop /= prime
+        end
+    end
+    return prime_factors
+end
+
+# sorting prime factors by type into an new array. Return: an array with multiple arrays, each array consists only of one type of prime factors
+# I'm pretty sure there is a pre-build method for this ... as my way is little complicated
+def sort_factors(prime_factors)
+    # different types are 2, 3, 5, 17. The names are not important. Later we will get the factors by index not by name.
+    twos = []
+    threes = []
+    fives = []
+    seventeens = []
+    sorted_factors = []
+
+    prime_factors.each do |factor|
+        case factor    
+        when 2
+            twos.push(factor)
+        when 3
+            threes.push(factor)
+        when 5
+            fives.push(factor)
+        when 17
+            seventeens.push(factor)
+        end
+    end
+    return sorted_factors.push(twos, threes, fives, seventeens) 
+end
+
+
+# create an new array to push in the of sounds of one raindrop depending on the prime factors. Return: single-array with strings of sounds.
+def create_sounds_of_one_raindrop(sorted_factors)
+    overall_length = sorted_factors.length  # overall_length is the length of the multi-array "sorted-factors" of one raindrop
+    sounds_of_one_raindrop = []  # creating a new empty array
+
+    overall_length.times do |i| # looping over the whole multi-array of one raindrop
+        # volume_level is the index position of the searched sound in a single-array within the muli-array. We have to decrease by -1 as the index of a array is starting with 0.
+        volume_level = sorted_factors[i].length - 1   
+
+        # as we have only three possible volume_levels, before we have to start over again, we check for more than MAX volume_level first.
+        while volume_level >= MAX 
+            sounds_of_one_raindrop.push(SOUNDS_OF_ALL[i][MAX]) # pushing 1x a MAX sound into the new array.
+            volume_level -= MAX + 1 # decrease the volume_level as we pushed a MAX volume_level into the array and start over again.
+        end
+
+        if volume_level  >= 0 # if volume_level is less than one, there is an empty array which we don't want to push into our array.
+            sounds_of_one_raindrop.push(SOUNDS_OF_ALL[i][volume_level]) # this pushes all volume_levels less than MAX into the array
+        end
+    end
+    return sounds_of_one_raindrop
+end
+
+
+# as we want to output the sounds of a raindrop in a specific format we need this helper-function. No return but printing the sounds to the screen.
+def output_sound_correctly(raindrop, sounds_of_one_raindrop)
+    sound = sounds_of_one_raindrop.length # there are three possible sound types depending on the length of the array "sounds_of_one_raindrop"
+    case sound
+    when 0  # if the length of the array is 0, the raindrop has no prime factor which will cause the fallback sound "blob"
+        puts "#{raindrop} = blob"
+    when 1  # if the length of the array is 1, the raindrop has one prime factor which will puts the one sound
+        puts "#{raindrop} = #{sounds_of_one_raindrop[0]}"
+    else  # if the length of the array is more than 1, the raindrop has multiple prime factors
+        i = sounds_of_one_raindrop.length 
+        print "#{raindrop} = "
+        while i > 1  # to get multiple sounds printed to the screen we need to loop over them
+            print "#{sounds_of_one_raindrop[- i]}, "
+            i -= 1
+        end
+        puts "#{sounds_of_one_raindrop[- i]}" # puts the last sound in the chain of sounds
+    end
+end
+
+
+NUMBER_OF_RAINDROPS.times do |raindrop|
+    raindrop += 1 # starting with 0 will cause an infinite loop
+    prime_factors = prime_number_decomposition(raindrop)
+    sorted_factors = sort_factors(prime_factors)
+    sounds_of_one_raindrop = create_sounds_of_one_raindrop(sorted_factors)
+    output_sound_correctly(raindrop, sounds_of_one_raindrop)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
